@@ -1,5 +1,10 @@
 const express = require('express');
+const dotenv = require("dotenv").config();
 const app = express();
+
+const connectDB = require("./config/dbConnection");
+connectDB();
+
 const PORT = 5000 || process.env.PORT;
 
 // .use is used when we want to handle middleware
