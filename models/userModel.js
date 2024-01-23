@@ -1,6 +1,6 @@
-const mongoose=require('mongoose');
+const mongoose = require('mongoose');
 
-const contactSchema=mongoose.Schema(
+const userSchema=mongoose.Schema(
     {
         name:{
             type: String,
@@ -9,16 +9,16 @@ const contactSchema=mongoose.Schema(
         email:{
             type: String,
             required: [true, "Email is required"],
+            unique: [true, "Email already exists!"]
         },
-        phone:{
+        password:{
             type: String,
-            required: [true, "Phone is required"],
+            required: [true, "Password is required"],
         },
     },
-
     {
         timestamps: true
     }
 )
 
-module.exports=mongoose.model("Contact", contactSchema);
+module.exports=mongoose.model("User", userSchema);
