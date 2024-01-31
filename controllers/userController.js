@@ -28,28 +28,30 @@ const register=asyncHandler(async (req, res)=>{
     
 })
 
-const login=asyncHandler(async (req, res)=>{
-    const {email, password}=req.body;
+const login = asyncHandler(async (req, res) => {
+    const { email, password } = req.body;
+
     if (!email || !password) {
-        return res.status(400).json({message: "Please provide all the fields!"});
+        return res.status(400).json({ message: "Please provide all the fields!" });
     }
 
-    const user=await UserModel.findOne({email});
-    if(user && await bcrypt.compare(password, user.password)){
-        const accessToken=jwt.sign({
-            user:{
-                name:user.name,
-                email:user.email,
-                id:user.id,
-            }
-        }, process.env.JWT_SECRET_KEY, {expiresIn: "3m"})
-        res.status(200).json({accessToken})
-    }else{
-        res.status(401).json({message: "Invalid email or password!"})
-    }
+    const user = await UserModel.findOne({ email });
 
-    res.json({message: "Login"});
-})
+    if (user && (await bcrypt.compare(password, user.password))) {
+        const accessToken = jwt.sign({
+            user: {
+                name: user.name,
+                email: user.email,
+                id: user.id,
+            },
+        }, process.env.JWT_SECRET_KEY, { expiresIn: "3m" });
+
+        return res.status(200).json({ accessToken });
+    } else {
+        return res.status(401).json({ message: "Invalid email or password!" });
+    }
+});
+
 
 const currentUser=asyncHandler(async (req, res)=>{
     res.json({message: "Current User"});

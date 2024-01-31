@@ -4,7 +4,7 @@ const asyncHandler = require("express-async-handler"); //used to handle errors i
 const contactModel = require("../models/contactModel"); //from models/contactModel.js which is a schema
 
 const getContacts = asyncHandler(async (req, res)=>{
-    const contacts=await contactModel.find();
+    const contacts=await contactModel.find({ user_id: req.user.id });
     res.status(200).json(contacts);
 })
 
@@ -21,7 +21,7 @@ const createContact= asyncHandler(async (req, res)=>{
     if(!name || !email || !phone){
         return res.status(400).json({message: "Please provide all the fields!"});
     }
-    const contact=await contactModel.create({name, email, phone});
+    const contact=await contactModel.create({name, email, phone, user_id:req.user.id});
     res.status(201).json(contact);
 })
 
@@ -31,6 +31,10 @@ const updateContact= asyncHandler(async (req, res)=>{
         return res.status(404).json({message: "Contact not found!"});
     }
     res.status(200).json(contact);
+
+    if(contact.user_id.toString() !== req.user.id.toString()){
+        return res.status(401).json({message: "Not authorized!"});
+    }
 
     const updateContact=await contactModel.findByIdAndUpdate(req.params.id, req.body, {new:true})
     res.status(200).json(updateContact);
@@ -42,6 +46,10 @@ const deleteContact= asyncHandler(async (req, res)=>{
         return res.status(404).json({message: "Contact not found!"});
     }
     res.status(200).json(contact);
+
+    if(contact.user_id.toString() !== req.user.id.toString()){
+        return res.status(401).json({message: "Not authorized!"});
+    }
 
     await contact.deleteOne();
     res.status(200).json({message: "Contact removed!"});
